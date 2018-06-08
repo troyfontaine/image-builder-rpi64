@@ -94,27 +94,6 @@ export DEST
 mkdir -p "$(dirname "${DEST}")"
 echo "nameserver 8.8.8.8" > "${DEST}"
 
-# # set up hypriot rpi repository for rpi specific kernel- and firmware-packages
-# PACKAGECLOUD_FPR=418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB
-# PACKAGECLOUD_KEY_URL=https://packagecloud.io/gpg.key
-# get_gpg "${PACKAGECLOUD_FPR}" "${PACKAGECLOUD_KEY_URL}"
-
-###arm64: not used for now
-# echo 'deb https://packagecloud.io/Hypriot/rpi/debian/ jessie main' > /etc/apt/sources.list.d/hypriot.list
-
-# # set up hypriot schatzkiste repository for generic packages
-# echo 'deb [arch=armhf] https://packagecloud.io/Hypriot/Schatzkiste/debian/ jessie main' >> /etc/apt/sources.list.d/hypriot.list
-
-# RPI_ORG_FPR=CF8A1AF502A2AA2D763BAE7E82B129927FA3303E RPI_ORG_KEY_URL=http://archive.raspberrypi.org/debian/raspberrypi.gpg.key
-# get_gpg "${RPI_ORG_FPR}" "${RPI_ORG_KEY_URL}"
-
-# echo 'deb [arch=armhf] http://archive.raspberrypi.org/debian/ jessie main' | tee /etc/apt/sources.list.d/raspberrypi.list
-
-# # make sure, we can use dedicated armhf packages
-# dpkg --add-architecture armhf
-# sed -i 's/deb http/deb [arch=arm64] http/g' /etc/apt/sources.list
-# sed -i 's/deb-src http/deb-src [arch=arm64] http/g' /etc/apt/sources.list
-
 # reload package sources
 apt-get update
 apt-get upgrade -y
@@ -210,50 +189,6 @@ mkdir -p /var/lib/cloud/seed/nocloud-net
 ln -s /boot/user-data /var/lib/cloud/seed/nocloud-net/user-data
 ln -s /boot/meta-data /var/lib/cloud/seed/nocloud-net/meta-data
 
-# install Docker Machine directly from GitHub releases
-curl -sSL "https://github.com/docker/machine/releases/download/v${DOCKER_MACHINE_VERSION}/docker-machine-Linux-aarch64" \
-  > /usr/local/bin/docker-machine
-chmod +x /usr/local/bin/docker-machine
-
-# install bash completion for Docker Machine
-curl -sSL "https://raw.githubusercontent.com/docker/machine/v${DOCKER_MACHINE_VERSION}/contrib/completion/bash/docker-machine.bash" -o /etc/bash_completion.d/docker-machine
-
-# install Docker Compose via pip
-apt-get install -y \
-  python
-curl -sSL https://bootstrap.pypa.io/get-pip.py | python
-pip install docker-compose=="${DOCKER_COMPOSE_VERSION}"
-
-# install bash completion for Docker Compose
-curl -sSL "https://raw.githubusercontent.com/docker/compose/${DOCKER_COMPOSE_VERSION}/contrib/completion/bash/docker-compose" -o /etc/bash_completion.d/docker-compose
-
-# # set up Docker APT repository and install docker-engine package
-# #TODO: pin package version to ${DOCKER_ENGINE_VERSION}
-# curl -sSL https://get.docker.com | /bin/sh
-
-# enable Docker Engine experimental features
-mkdir -p /etc/docker/
-echo '{
-  "experimental": true
-}
-' > /etc/docker/daemon.json
-
-#TODO:+++ change to Debian Stretch official repo, as soon as it's available
-# install Docker CE directly from Docker APT Repo but built for Debian Stretch ARM64
-DOCKER_DEB="docker-ce_${DOCKER_ENGINE_VERSION}-0~debian_arm64.deb"
-curl -sSL "https://download.docker.com/linux/debian/dists/stretch/pool/edge/arm64/$DOCKER_DEB" \
-  > "/$DOCKER_DEB"
-if [ -f "/$DOCKER_DEB" ]; then
-  # install some runtime requirements for Docker CE
-  apt-get install -y libapparmor1 libltdl7 libseccomp2
-
-  # install Docker CE
-  dpkg -i "/$DOCKER_DEB" || /bin/true
-  rm -f "/$DOCKER_DEB"
-
-  # fix missing apt-get install dependencies
-  apt-get -f install -y
-fi
 #TODO:---
 
 echo "Installing rpi-serial-console script"
