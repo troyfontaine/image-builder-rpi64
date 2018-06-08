@@ -24,63 +24,13 @@ You can build the SD card image locally with Vagrant.
 
 ### Setting up build environment
 
-Make sure you have [vagrant](https://docs.vagrantup.com/v2/installation/) and [docker-machine](https://docs.docker.com/machine/install-machine/) installed.
-Then run the following command to create the Vagrant box and the Docker Machine
-connection. The Vagrant box is needed as a vanilla boot2docker VM is not able to
-run guestfish inside. Use `export VAGRANT_DEFAULT_PROVIDER=virtualbox` to
-strictly create a VirtualBox VM.
+Building this image requires Travis-CI.  Local building isn't supported or recommended.
 
-```bash
-make docker-machine
-```
-
-Now set the Docker environments to this new docker machine:
-
-```bash
-eval $(docker-machine env image-builder-rpi64)
-```
-
-### Build the SD card image
-
-From here you can just make the SD card image. The output will be written and
-compressed to `hypriotos-rpi64-dirty.img.zip`.
-
-```bash
-make sd-image
-```
-
-### Run Serverspec tests
-
-To test the compressed SD card image with [Serverspec](http://serverspec.org)
-just run the following command. It will expand the SD card image in a Docker
-container and run the Serverspec tests in `builder/test/` folder against it.
-
-```bash
-make test
-```
-
-### Run integration tests
-
-Now flash the SD card image and boot up a Raspberry Pi. Run the [Serverspec](http://serverspec.org) integration tests in `builder/test-integration/`
-folder against your Raspberry Pi. Set the environment variable `BOARD` to the
-IP address or host name of your running Raspberry Pi.
-
-```bash
-flash hypriotos-rpi64-dirty.img.zip
-BOARD=black-pearl.local make test-integration
-```
-
-This test works with any Docker Machine, so you do not need to create the
-Vagrant box.
+There are two env variables that must be set in Travis-CI:
+- GITHUB_TOKEN
+- GITHUB_OAUTH_TOKEN
 
 ## Deployment
-
-For maintainers of this project you can release a new version and deploy the
-SD card image to GitHub releases with
-
-```bash
-TAG=v0.0.1 make tag
-```
 
 After that open the GitHub release of this version and fill it with relevant
 changes and links to resolved issues.
@@ -88,4 +38,3 @@ changes and links to resolved issues.
 ## License
 
 MIT - see the [LICENSE](./LICENSE) file for details.
-

@@ -43,11 +43,4 @@ describe "SD card image" do
     end
   end
 
-  context "Docker systemd service file" do
-    let(:stdout) { run_mounted("cat /lib/systemd/system/docker.service").stdout }
-
-    it "Docker Engine is installed" do
-      expect(stdout).to contain("/usr/bin/dockerd")
-    end
-  end
 end
