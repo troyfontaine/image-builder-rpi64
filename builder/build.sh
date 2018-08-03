@@ -17,10 +17,10 @@ BUILD_PATH="/build"
 ROOTFS_TAR=${ROOT_FS_ARTIFACT}
 ROOTFS_TAR_PATH="${BUILD_RESULT_PATH}/${ROOTFS_TAR}"
 
-# Show TRAVSI_TAG in travis builds
+# Show TRAVIS_TAG in travis builds
 echo TRAVIS_TAG="${TRAVIS_TAG}"
 
-# name of the sd-image we gonna create
+# name of the sd-image we're gonna create
 HYPRIOT_IMAGE_VERSION=${VERSION:="dirty"}
 HYPRIOT_IMAGE_NAME="hypriotos-rpi64-${HYPRIOT_IMAGE_VERSION}.img"
 export HYPRIOT_IMAGE_VERSION
