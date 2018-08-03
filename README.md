@@ -20,9 +20,10 @@ Here is an example how all the GitHub repos play together:
 You can contribute to this repo by forking it and sending us pull requests.
 Feedback is always welcome!
 
-You can build the SD card image locally with Vagrant.
+## Installing the Image
+The team at [Hypriot](https://blog.hypriot.com) have provided a wonderful tool called [Flash](https://github.com/hypriot/flash).  Check out the Readme at their Github Repo for more information on how to use the image.
 
-### Setting up build environment
+### Building
 
 Building this image requires Travis-CI.  Local building isn't supported or recommended.
 
@@ -32,8 +33,10 @@ There are two env variables that must be set in Travis-CI:
 
 ## Deployment
 
-After that open the GitHub release of this version and fill it with relevant
-changes and links to resolved issues.
+After the Travis build finishes, open the GitHub release of the version you just created and fill it with relevant changes and links to resolved issues.
+
+## Resources
+This project uses [GHR](https://github.com/tcnksm/ghr/) to push releases from Travis to Github.
 
 ## License
 
