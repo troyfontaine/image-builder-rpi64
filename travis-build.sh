@@ -56,7 +56,7 @@ if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
     tar -zxvf ghr.tar.gz
     mv ghr_v"$GHR_VERSION"_linux_amd64/ghr ./
     ./ghr --version
-    ./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" "$GIT_TAG builds/$BUILD_NR/"
+    ./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" "$GIT_TAG" "builds/$BUILD_NR/"
   fi
 
 fi
