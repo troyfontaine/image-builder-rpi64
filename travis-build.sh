@@ -17,30 +17,35 @@ if [ -z "$GITHUB_OAUTH_TOKEN" ]; then
   exit 1
 fi
 
-# verbose logging
+# Verbose logging
 set -x
 
-# create a build number
+# Create a build number
 export BUILD_NR="$(date '+%Y%m%d-%H%M%S')"
 echo "BUILD_NR=$BUILD_NR"
 
-# run build
-#-create build dest
+# Run build steps
+# Create build directory
 BUILD_DEST=builds/$BUILD_NR
 mkdir -p $BUILD_DEST
-#-build
+
+# Build image
 VERSION=v$BUILD_NR make shellcheck
 VERSION=v$BUILD_NR make sd-image
-#-test
+
+# Test image
 VERSION=v$BUILD_NR make test
-#-move artifacts to build dest
-mv hypriotos-rpi64* $BUILD_DEST/
 
+# Prep the build to go to Github releases if we're on the master branch
+if [ "$TRAVIS_BRANCH" == "master"]; then
+  # Move artifacts to build dest
+  mv hypriotos-rpi64* $BUILD_DEST/
 
-# deploy to GitHub releases
-export GIT_TAG=v$BUILD_NR
-export GIT_RELTEXT="Auto-released by [Travis-CI build #$TRAVIS_BUILD_NUMBER](https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID)"
-curl -sSL https://github.com/tcnksm/ghr/releases/download/v0.5.4/ghr_v0.5.4_linux_amd64.zip > ghr.zip
-unzip ghr.zip
-./ghr --version
-./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" $GIT_TAG builds/$BUILD_NR/
+  # Deploy to GitHub releases
+  export GIT_TAG=v$BUILD_NR
+  export GIT_RELTEXT="Auto-released by [Travis-CI build #$TRAVIS_BUILD_NUMBER](https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID)"
+  curl -sSL https://github.com/tcnksm/ghr/releases/download/v0.5.4/ghr_v0.5.4_linux_amd64.zip > ghr.zip
+  unzip ghr.zip
+  ./ghr --version
+  ./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" $GIT_TAG builds/$BUILD_NR/
+fi

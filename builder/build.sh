@@ -1,5 +1,8 @@
 #!/bin/bash -e
 set -x
+
+echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
 # This script should be run only inside of a Docker container
 if [ ! -f /.dockerenv ]; then
   echo "ERROR: script works only in a Docker container!"
@@ -146,6 +149,3 @@ umask 0000
 # compress image
 zip "${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}.zip" "${HYPRIOT_IMAGE_NAME}"
 cd ${BUILD_RESULT_PATH} && sha256sum "${HYPRIOT_IMAGE_NAME}.zip" > "${HYPRIOT_IMAGE_NAME}.zip.sha256" && cd -
-
-# # test sd-image that we have built
-# VERSION=${HYPRIOT_IMAGE_VERSION} rspec --format documentation --color ${BUILD_RESULT_PATH}/builder/test

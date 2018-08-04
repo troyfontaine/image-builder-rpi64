@@ -5,3 +5,9 @@
 *.tar.gz.sha256
 .vagrant/
 resources/
+.vscode
+travis-build.sh
+travis.yml
+README.md
+LICENSE
+Makefile

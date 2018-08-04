@@ -81,6 +81,7 @@ function get_gpg(){
   fi
 }
 
+
 ## examples:
 # clean_print {print|fpr|long|short} {GPGKEYID|FINGERPRINT}
 # get_gpg {GPGKEYID|FINGERPRINT} [URL|FILE]
@@ -98,34 +99,11 @@ echo "nameserver 8.8.8.8" > "${DEST}"
 apt-get update
 apt-get upgrade -y
 
-# # install WiFi firmware packages (same as in Raspbian)
-# apt-get install -y \
-#   firmware-atheros \
-#   firmware-brcm80211 \
-#   firmware-libertas \
-#   firmware-ralink \
-#   firmware-realtek
-
-#+++for now copy files statically from ./builder/files/lib/firmware/brcm
-# # install WiFi firmware for internal RPi3 WiFi module
-# mkdir -p /lib/firmware/brcm
-# curl -sSL https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.bin > /lib/firmware/brcm/brcmfmac43430-sdio.bin
-#---
-
-# install kernel- and firmware-packages
-# apt-get install -y \
-#   "raspberrypi-kernel=${KERNEL_BUILD}" \
-#   "raspberrypi-bootloader=${KERNEL_BUILD}" \
-#   "libraspberrypi0=${KERNEL_BUILD}" \
-#   "libraspberrypi-dev=${KERNEL_BUILD}" \
-#   "libraspberrypi-bin=${KERNEL_BUILD}"
-
 # enable serial console
 printf "# Spawn a getty on Raspberry Pi serial line\nT0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100\n" >> /etc/inittab
 
 # boot/cmdline.txt
 echo "dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 cgroup_enable=cpuset cgroup_memory=1 swapaccount=1 elevator=deadline fsck.repair=yes rootwait console=ttyAMA0,115200 net.ifnames=0" > /boot/cmdline.txt
-# " net.ifnames=0" is neccessary for Debian Stretch: see https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
 
 # create a default boot/config.txt file (details see http://elinux.org/RPiconfig)
 echo "
@@ -144,10 +122,6 @@ echo "# setting for maximum memory, gpu_mem to minimum 16M, camera off
 start_x=0
 gpu_mem=16
 " >> boot/config.txt
-
-# # /etc/modules
-# echo "snd_bcm2835
-# " >> /etc/modules
 
 # create /etc/fstab
 echo "
@@ -168,10 +142,6 @@ apt-get install -y \
   crda
 
 # # add firmware and packages for managing bluetooth devices
-# apt-get install -y \
-#   --no-install-recommends \
-#   bluetooth \
-#   pi-bluetooth
 apt-get install -y \
   --no-install-recommends \
   bluetooth
@@ -208,12 +178,16 @@ HYPRIOT_KERNEL_BUILD="${KERNEL_BUILD}"
 HYPRIOT_KERNEL_VERSION="${KERNEL_VERSION}"
 HYPRIOT_DEVICE="$HYPRIOT_DEVICE"
 HYPRIOT_IMAGE_VERSION="$HYPRIOT_IMAGE_VERSION"
+HYPRIOT_OS="HypriotOS/arm64"
+HYPRIOT_OS_VERSION="$HYPRIOT_OS_VERSION"
 EOF
 else
 cat <<EOF >> /etc/os-release
 HYPRIOT_KERNEL_VERSION="${KERNEL_VERSION}"
 HYPRIOT_DEVICE="$HYPRIOT_DEVICE"
 HYPRIOT_IMAGE_VERSION="$HYPRIOT_IMAGE_VERSION"
+HYPRIOT_OS="HypriotOS/arm64"
+HYPRIOT_OS_VERSION="$HYPRIOT_OS_VERSION"
 EOF
 fi
 cp /etc/os-release /boot/os-release
