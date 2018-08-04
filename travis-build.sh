@@ -54,7 +54,7 @@ if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
     export GIT_RELTEXT="Auto-released by [Travis-CI build #$TRAVIS_BUILD_NUMBER](https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID)"
     curl -sSL https://github.com/tcnksm/ghr/releases/download/v$GHR_VERSION/ghr_v"$GHR_VERSION"_linux_amd64.tar.gz > ghr.tar.gz
     tar -zxvf ghr.tar.gz
-    mv ghr_v"$GHR_VERSION"_linux_amd64 ghr
+    mv ghr_v"$GHR_VERSION"_linux_amd64/ghr ./
     ./ghr --version
     ./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" "$GIT_TAG builds/$BUILD_NR/"
   fi
