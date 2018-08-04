@@ -25,6 +25,11 @@ BUILD_NR="$(date '+%Y%m%d-%H%M%S')"
 export "BUILD_NR=$BUILD_NR"
 echo "BUILD_NR=$BUILD_NR"
 
+# Set GHR Version to use
+GHR_VERSION="0.10.2"
+export "GHR_VERSION=$GHR_VERSION"
+echo "GHR_VERSION=$GHR_VERSION"
+
 # Run build steps
 # Create build directory
 BUILD_DEST="builds/$BUILD_NR"
@@ -47,8 +52,9 @@ if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
     # Deploy to GitHub releases
     export GIT_TAG=v$BUILD_NR
     export GIT_RELTEXT="Auto-released by [Travis-CI build #$TRAVIS_BUILD_NUMBER](https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID)"
-    curl -sSL https://github.com/tcnksm/ghr/releases/download/v0.10.2/ghr_v0.10.2_linux_amd64.zip > ghr.zip
-    unzip ghr.zip
+    curl -sSL https://github.com/tcnksm/ghr/releases/download/v$GHR_VERSION/ghr_v"$GHR_VERSION"_linux_amd64.tar.gz > ghr.tar.gz
+    tar -zxvf ghr.tar.gz
+    mv ghr_v"$GHR_VERSION"_linux_amd64 ghr
     ./ghr --version
     ./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" "$GIT_TAG builds/$BUILD_NR/"
   fi
