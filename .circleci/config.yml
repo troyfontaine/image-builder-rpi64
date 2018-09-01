@@ -20,6 +20,7 @@ jobs:
       - run:
           name: "Set environment variables"
           command: |
+            # Carry our environment variables through out
             BUILD_NR="$(date '+%Y%m%d-%H%M%S')"
             echo "export BUILD_NR=$BUILD_NR" >> env
             GHR_VERSION="0.12.0"
@@ -28,7 +29,9 @@ jobs:
             echo "export GIT_RELTEXT=\"Auto-released by [CircleCI build \#$CIRCLE_BUILD_NUM]($CIRCLE_BUILD_URL)\"" >> env
       - run:
           name: "Load environment variables"
-          command: echo "$(cat env)" >> $BASH_ENV
+          command: |
+            echo "$(cat env)" >> $BASH_ENV
+            . $BASH_ENV
       - run:
           name: "Create Build Directory"
           command: mkdir -p "builds/$BUILD_NR"
@@ -62,11 +65,7 @@ jobs:
           name: "Load environment variables"
           command: |
             echo "$(cat env)" >> $BASH_ENV
-            echo "$(cat env)"
-      - run:
-          name: "Set Git Release Variables"
-          command: |
-            
+            . $BASH_ENV
       - run:
           name: "Download and install GHR"
           command: |
