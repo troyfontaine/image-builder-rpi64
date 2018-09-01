@@ -21,7 +21,10 @@ ROOTFS_TAR=${ROOT_FS_ARTIFACT}
 ROOTFS_TAR_PATH="${BUILD_RESULT_PATH}/${ROOTFS_TAR}"
 
 # Show TRAVIS_TAG in travis builds
-echo TRAVIS_TAG="${TRAVIS_TAG}"
+#echo TRAVIS_TAG="${TRAVIS_TAG}"
+
+# Show CIRCLE_TAG in Circle builds
+echo CIRCLE_TAG="${CIRCLE_TAG}"
 
 # name of the sd-image we're gonna create
 HYPRIOT_IMAGE_VERSION=${VERSION:="dirty"}
@@ -131,6 +134,9 @@ if [ "$FETCH_MISSING_ARTIFACTS" == "true" ]; then
 fi
 
 unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "/${HYPRIOT_IMAGE_NAME}"
+
+# Enable debugging for Guestfs
+export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
 
 # create the image and add root base filesystem
 guestfish -a "/${HYPRIOT_IMAGE_NAME}"<<_EOF_
