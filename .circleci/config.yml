@@ -14,7 +14,7 @@ jobs:
 
   build-and-test:
     machine:
-      image: circleci/classic:201708-01
+      image: circleci/classic:201708-08
     steps:
       - checkout
       - run:
@@ -49,15 +49,19 @@ jobs:
             - builds          
 
   publish:
-    docker:
-      - image: buildpack-deps:trusty
+    machine:
+      image: circleci/classic:201708-08
+#    docker:
+#      - image: buildpack-deps:trusty
     steps:
       - restore_cache:
           keys:
             - project-{{ .Branch }}-{{ .Revision }}
       - run:
           name: "Load environment variables"
-          command: echo "$(cat env)" >> $BASH_ENV
+          command: |
+            echo "$(cat env)" >> $BASH_ENV
+            echo "$(cat env)"
       - run:
           name: "Set Git Release Variables"
           command: |
