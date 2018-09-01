@@ -87,7 +87,9 @@ workflows:
             - build-and-test
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - circle_ci
   scheduled-workflow:
     triggers:
       - schedule:
