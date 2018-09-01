@@ -11,37 +11,11 @@ jobs:
           command: |
             find . -type f -name '*.sh' | wc -l
             find . -type f -name '*.sh' | xargs shellcheck --external-sources
-  checkout_code:
-    docker:
-      - image: circleci/buildpack-deps:trusty
-    steps:
-      - checkout
-      - run:
-          name: "Set environment variables"
-          command: |
-            BUILD_NR="$(date '+%Y%m%d-%H%M%S')"
-            echo "export BUILD_NR=$BUILD_NR" >> env
-            GHR_VERSION="0.10.2"
-            echo "export GHR_VERSION=$GHR_VERSION" >> env
-            BUILD_DEST="builds/$BUILD_NR"
-            echo "export BUILD_DEST=$BUILD_DEST" >> env
-      - save_cache:
-          key: project-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - env
-            - builder
-            - .dockerignore
-            - Dockerfile
-            - Makefile
+
   build-and-test:
     machine:
       image: circleci/classic:201708-01
     steps:
-#      - setup_remote_docker:
-#          docker_layer_caching: true
-#      - restore_cache:
-#          keys:
-#            - project-{{ .Branch }}-{{ .Revision }}
       - checkout
       - run:
           name: "Set environment variables"
@@ -64,43 +38,70 @@ jobs:
           name: "Test Image"
           command: |
             sudo bash -c "VERSION=v$BUILD_NR make test"
+      - run:
+          name: "Move build"
+          command: |
+            mv hypriotos-rpi64* "builds/$BUILD_NR"
+      - save_cache:
+          key: project-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - env
+            - builds          
+
   publish:
     docker:
-      - image: circleci/ruby:2.2
+      - image: buildpack-deps:trusty
     steps:
+      - restore_cache:
+          keys:
+            - project-{{ .Branch }}-{{ .Revision }}
       - run:
-          name: "Placeholder"
-          command: echo "DOOM"
+          name: "Load environment variables"
+          command: echo "$(cat env)" >> $BASH_ENV
+      - run:
+          name: "Set Git Release Variables"
+          command: |
+            export GIT_TAG=v$BUILD_NR
+            export GIT_RELTEXT="Auto-released by [CircleCI build #$CIRCLE_BUILD_NUM]($CIRCLE_BUILD_URL)"
+      - run:
+          name: "Download and install GHR"
+          command: |
+            curl -sSL https://github.com/tcnksm/ghr/releases/download/v$GHR_VERSION/ghr_v"$GHR_VERSION"_linux_amd64.tar.gz > ghr.tar.gz
+            tar -zxvf ghr.tar.gz
+            mv ghr_v"$GHR_VERSION"_linux_amd64/ghr ./
+      - run:
+          name: "Execute GHR"
+          command: |
+            ./ghr --version
+            ./ghr --debug -u troyfontaine -b "$GIT_RELTEXT" "$GIT_TAG" "builds/$BUILD_NR/"
 
 workflows:
   version: 2
   commit-workflow:
     jobs:
-#      - shellcheck
-#      - checkout_code
+      - shellcheck
       - build-and-test
-#          requires:
-#            - checkout_code
-#      - publish:
-#          requires:
-#            - checkout_code
-#            - build-and-test
-#          filters:
-#            branches:
-#              only: master
-#  scheduled-workflow:
-#    triggers:
-#      - schedule:
-#          cron: "0 1 * * *"
-#          filters:
-#            branches:
-#              only: master
-#    jobs:
-#      - checkout_code
-#      - build-and-test:
-#          requires:
-#            - checkout_code
-#      - publish:
-#          requires:
-#            - checkout_code
-#            - build-and-test
+      - publish:
+          requires:
+            - shellcheck
+            - build-and-test
+          filters:
+            branches:
+              only: master
+  scheduled-workflow:
+    triggers:
+      - schedule:
+          cron: "0 1 * * *"
+          filters:
+            branches:
+              only: master
+    jobs:
+      - shellcheck
+      - build-and-test
+      - publish:
+          requires:
+            - shellcheck
+            - build-and-test
+          filters:
+            branches:
+              only: master
