@@ -21,9 +21,6 @@ function clean_print(){
     if [[ "${fingerprint}" != "${nospaces}" ]]; then
       printf "%-10s %50s\n" fpr: "${fingerprint}"
     fi
-    # if [[ "${nospaces}" != "${tolowercase}" ]]; then
-    #   printf "%-10s %50s\n" nospaces: $nospaces
-    # fi
     if [[ "${tolowercase}" != "${KEYID_long}" ]]; then
       printf "%-10s %50s\n" lower: "${tolowercase}"
     fi
@@ -49,7 +46,6 @@ function get_gpg(){
     wget -q -O "${KEY_FILE}" "${KEY_URL}"
   elif [[ -z "${KEY_URL}" ]]; then
     echo "no source given try to load from key server"
-#    gpg --keyserver "${KEYSERVER}" --recv-keys "${GPG_KEY}"
     apt-key adv --keyserver "${KEYSERVER}" --recv-keys "${GPG_KEY}"
     return $?
   else
