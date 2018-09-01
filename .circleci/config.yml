@@ -46,7 +46,8 @@ jobs:
           key: project-{{ .Branch }}-{{ .Revision }}
           paths:
             - env
-            - builds          
+            - builds
+            - .git
 
   publish:
     machine:
